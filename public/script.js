@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/todos';
+const API_URL = '/todos';
 
 async function loadTodos() {
   const res = await fetch(API_URL);
