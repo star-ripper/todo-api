@@ -1,7 +1,21 @@
 const API_URL = '/todos';
+const token = localStorage.getItem('token');
+
+if (!token) {
+  window.location.href = 'login.html';
+}
 
 async function loadTodos() {
-  const res = await fetch(API_URL);
+  const res = await fetch(API_URL, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+
+  if (res.status === 401) {
+    localStorage.removeItem('token');
+    window.location.href = 'login.html';
+    return;
+  }
+
   const todos = await res.json();
 
   const list = document.getElementById('todoList');
@@ -36,7 +50,10 @@ async function addTodo() {
 
   await fetch(API_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
     body: JSON.stringify({ title })
   });
 
@@ -47,7 +64,10 @@ async function addTodo() {
 async function toggleTodo(id, completed) {
   await fetch(`${API_URL}/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
     body: JSON.stringify({ completed })
   });
 
@@ -56,7 +76,8 @@ async function toggleTodo(id, completed) {
 
 async function deleteTodo(id) {
   await fetch(`${API_URL}/${id}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` }
   });
 
   loadTodos();
