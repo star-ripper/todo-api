@@ -1,9 +1,33 @@
 const API_URL = '/todos';
 const token = localStorage.getItem('token');
 
+
+
+
 if (!token) {
   window.location.href = 'login.html';
 }
+
+
+function logout() {
+  localStorage.removeItem('token');
+  window.location.href = 'login.html';
+}
+
+
+const INACTIVITY_LIMIT = 1 * 60 * 1000; // 1 minutes, adjust as needed
+let inactivityTimer;
+
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(logout, INACTIVITY_LIMIT);
+}
+
+['mousemove', 'keydown', 'click', 'scroll'].forEach(event => {
+  document.addEventListener(event, resetInactivityTimer);
+});
+
+resetInactivityTimer();
 
 async function loadTodos() {
   const res = await fetch(API_URL, {
